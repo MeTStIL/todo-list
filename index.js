@@ -32,6 +32,11 @@
 
 class Component {
     constructor() {
+        this.state = [
+            'Сделать домашку',
+            'Сделать практику',
+            'Пойти домой'
+        ];
     }
 
     getDomNode() {
@@ -48,27 +53,39 @@ class Component {
 
 class AddTask extends Component {
 
+    constructor() {
+        super();
+        this.onAddTask();
+    }
+
+    onAddTask() {
+        this.state.push(this.inputValue);
+        this.inputValue = '';
+        this.render
+    }
+
 }
 
 class Task extends Component {
 
+    constructor() {
+        super();
+
+    }
+
 }
 
 class TodoList extends Component {
-    constructor(tag, attributes, children) {
+    constructor() {
         super();
 
-        this.inputValue = '';
+        this.addTask = new AddTask();
+        this.task = new Task();
 
-        this.state = [
-            'Сделать домашку',
-            'Сделать практику',
-            'Пойти домой'
-        ];
     }
 
     render() {
-        const todoItems = this.state.map(task =>
+        const todoItems = this.addTask.state.map(task =>
             createElement("li", {}, [
                 createElement("input", { type: "checkbox" }, {}, {
                     onchange : this.onChangeElement.bind(this)
@@ -98,11 +115,6 @@ class TodoList extends Component {
         ]);
     }
 
-    onAddTask() {
-        this.state.push(this.inputValue);
-        this.inputValue = '';
-        super.update();
-    }
 
     onAddInputChange(element) {
         this.inputValue = element.target.value;
