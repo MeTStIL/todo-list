@@ -87,6 +87,8 @@ class Task extends Component {
         this.onToggle = onToggle;
         this.onDelete = onDelete;
         this.completed = false;
+
+        this.status = false;
     }
 
     render() {
@@ -102,7 +104,14 @@ class Task extends Component {
             }),
             createElement("label", {style: `color: ${labelStyle}`}, this.task),
             createElement("button", {}, "🗑️", {
-                onclick: () => this.onDelete(this.task)
+                onclick: (e) => {
+                    if (this.status) {
+                        this.onDelete(this.task)
+                    } else {
+                        e.target.style.backgroundColor = 'red';
+                        this.status = true;
+                    }
+                }
             })
         ]);
     }
@@ -125,14 +134,7 @@ class TodoList extends Component {
     };
 
     onChangeElement(element) {
-        const p = element.target.parentElement;
-        const l = p.querySelector('label');
 
-        if (l.style.color === 'gray') {
-            l.style.color = 'black';
-        } else {
-            l.style.color = 'gray';
-        }
     }
 
     render() {
