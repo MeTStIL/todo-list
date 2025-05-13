@@ -46,6 +46,14 @@ class Component {
     }
 }
 
+class AddTask extends Component {
+
+}
+
+class Task extends Component {
+
+}
+
 class TodoList extends Component {
     constructor(tag, attributes, children) {
         super();
