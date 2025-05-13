@@ -44,7 +44,7 @@ class Component {
         return this._domNode;
     }
 
-    update () {
+    update() {
         const newNode = this.render();
         this._domNode.replaceWith(newNode);
         this._domNode = newNode;
@@ -53,72 +53,76 @@ class Component {
 
 class AddTask extends Component {
 
-    constructor() {
+    constructor(onAddTask) {
         super();
-        this.onAddTask();
+        this.onAddTask = onAddTask;
+        this.inputValue = '';
     }
 
-    onAddTask() {
-        this.state.push(this.inputValue);
-        this.inputValue = '';
-        this.render
+    render() {
+        return createElement("div", {class: "add-todo"}, [
+            createElement("input", {
+                type: "text",
+                placeholder: "Задание"
+            }, {}, {
+                oninput: (e) => {
+                    this.inputValue = e.target.value;
+                }
+            }),
+            createElement("button", {}, "+", {
+                onclick: () => {
+                    this.onAddTask(this.inputValue);
+                    this.inputValue = '';
+                }
+            })
+        ]);
     }
 
 }
 
 class Task extends Component {
-
-    constructor() {
+    constructor(task, onToggle, onDelete) {
         super();
-
+        this.task = task;
+        this.onToggle = onToggle;
+        this.onDelete = onDelete;
+        this.completed = false;
     }
 
+    render() {
+        const labelStyle = this.completed ? "gray" : "black";
+
+        return createElement("li", {}, [
+            createElement("input", {type: "checkbox"}, null, {
+                onchange: () => {
+                    this.completed = !this.completed;
+                    this.onToggle(this.task);
+                    super.update();
+                }
+            }),
+            createElement("label", {style: `color: ${labelStyle}`}, this.task),
+            createElement("button", {}, "🗑️", {
+                onclick: () => this.onDelete(this.task)
+            })
+        ]);
+    }
 }
+
 
 class TodoList extends Component {
     constructor() {
         super();
-
-        this.addTask = new AddTask();
-        this.task = new Task();
-
     }
 
-    render() {
-        const todoItems = this.addTask.state.map(task =>
-            createElement("li", {}, [
-                createElement("input", { type: "checkbox" }, {}, {
-                    onchange : this.onChangeElement.bind(this)
-                }),
-                createElement("label", {}, task),
-                createElement("button", {}, "🗑️", {
-                    onclick : this.onDeleteElement.bind(this)
-                })
-            ])
-        );
+    onAddTask = (task) => {
+        this.state.push(task);
+        this.update();
+    };
 
-        return createElement("div", { class: "todo-list" }, [
-            createElement("h1", {}, "TODO List"),
-            createElement("div", { class: "add-todo" }, [
-                createElement("input", {
-                    id: "new-todo",
-                    type: "text",
-                    placeholder: "Задание",
-                }, {}, {
-                    oninput : this.onAddInputChange.bind(this)
-                }),
-                createElement("button", { id: "add-btn" }, "+", {
-                    onclick: this.onAddTask.bind(this)
-                }),
-            ]),
-            createElement("ul", { id: "todos" }, todoItems),
-        ]);
-    }
-
-
-    onAddInputChange(element) {
-        this.inputValue = element.target.value;
-    }
+    onDeleteTask = (task) => {
+        this.state = this.state.filter(t => t !== task);
+        this.update();
+    };
 
     onChangeElement(element) {
         const p = element.target.parentElement;
@@ -129,14 +133,20 @@ class TodoList extends Component {
         } else {
             l.style.color = 'gray';
         }
-
     }
 
-    onDeleteElement(element) {
-        const p = element.target.parentElement;
-        this.state = this.state.filter(task => task !== p.querySelector('label').textContent);
-        super.update();
+    render() {
+        const taskElements = this.state.map(task =>
+            new Task(task, this.onChangeElement, this.onDeleteTask).getDomNode()
+        );
 
+        const addTaskComponent = new AddTask(this.onAddTask).getDomNode();
+
+        return createElement("div", { class: "todo-list" }, [
+            createElement("h1", {}, "TODO List"),
+            addTaskComponent,
+            createElement("ul", { id: "todos" }, taskElements)
+        ]);
     }
 }
 
