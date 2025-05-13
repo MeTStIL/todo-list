@@ -38,6 +38,12 @@ class Component {
         this._domNode = this.render();
         return this._domNode;
     }
+
+    update () {
+        const newNode = this.render();
+        this._domNode.replaceWith(newNode);
+        this._domNode = newNode;
+    }
 }
 
 class TodoList extends Component {
@@ -56,9 +62,13 @@ class TodoList extends Component {
     render() {
         const todoItems = this.state.map(task =>
             createElement("li", {}, [
-                createElement("input", { type: "checkbox" }),
+                createElement("input", { type: "checkbox" }, {}, {
+                    onchange : this.onChangeElement.bind(this)
+                }),
                 createElement("label", {}, task),
-                createElement("button", {}, "🗑️")
+                createElement("button", {}, "🗑️", {
+                    onclick : this.onDeleteElement.bind(this)
+                })
             ])
         );
 
@@ -83,10 +93,30 @@ class TodoList extends Component {
     onAddTask() {
         this.state.push(this.inputValue);
         this.inputValue = '';
+        super.update();
     }
 
     onAddInputChange(element) {
         this.inputValue = element.target.value;
+    }
+
+    onChangeElement(element) {
+        const p = element.target.parentElement;
+        const l = p.querySelector('label');
+
+        if (l.style.color === 'gray') {
+            l.style.color = 'black';
+        } else {
+            l.style.color = 'gray';
+        }
+
+    }
+
+    onDeleteElement(element) {
+        const p = element.target.parentElement;
+        this.state = this.state.filter(task => task !== p.querySelector('label').textContent);
+        super.update();
+
     }
 }
 
