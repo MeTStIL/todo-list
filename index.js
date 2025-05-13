@@ -1,4 +1,4 @@
-﻿function createElement(tag, attributes, children) {
+﻿function createElement(tag, attributes, children, callbacks) {
     const element = document.createElement(tag);
 
     if (attributes) {
@@ -38,40 +38,45 @@ class TodoList extends Component {
     constructor(tag, attributes, children) {
         super();
 
-        this.state = ['Сделать домашку', 'Сделать практику', 'Пойти домой'];
+        this.state = [
+            'Сделать домашку',
+            'Сделать практику',
+            'Пойти домой'
+        ];
     }
 
-
     render() {
-        let children = [];
-        for (const element of this.state) {
-            children.push(
-                createElement("li", {}, [
-                    createElement("input", {type: "checkbox"}),
-                    createElement("label", {}, element),
-                    createElement("button", {}, "🗑️")
-                ]),
-            )
-        }
+        const todoItems = this.state.map(task =>
+            createElement("li", {}, [
+                createElement("input", { type: "checkbox" }),
+                createElement("label", {}, task),
+                createElement("button", {}, "🗑️")
+            ])
+        );
 
-        const output = [
+        return createElement("div", { class: "todo-list" }, [
             createElement("h1", {}, "TODO List"),
-            createElement("div", {class: "add-todo"}, [
+            createElement("div", { class: "add-todo" }, [
                 createElement("input", {
                     id: "new-todo",
                     type: "text",
                     placeholder: "Задание",
                 }),
-                createElement("button", {id: "add-btn"}, "+"),
+                createElement("button", { id: "add-btn" }, "+"),
             ]),
-            createElement("ul", {id: "todos"}, children),
-        ]
+            createElement("ul", { id: "todos" }, todoItems),
+        ]);
+    }
 
+    onAddTask(task) {
+        this.state.push(task);
+    }
 
+    onAddInputChange(element){
 
-        return createElement("div", {class: "todo-list"}, output);
     }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(new TodoList().getDomNode());
