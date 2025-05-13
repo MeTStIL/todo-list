@@ -7,6 +7,12 @@
         });
     }
 
+    if (callbacks) {
+        for (const [action, func] of Object.entries(callbacks)) {
+            element[action] = func;
+        }
+    }
+
     if (Array.isArray(children)) {
         children.forEach((child) => {
             if (typeof child === "string") {
@@ -38,6 +44,8 @@ class TodoList extends Component {
     constructor(tag, attributes, children) {
         super();
 
+        this.inputValue = '';
+
         this.state = [
             'Сделать домашку',
             'Сделать практику',
@@ -61,19 +69,24 @@ class TodoList extends Component {
                     id: "new-todo",
                     type: "text",
                     placeholder: "Задание",
+                }, {}, {
+                    oninput : this.onAddInputChange.bind(this)
                 }),
-                createElement("button", { id: "add-btn" }, "+"),
+                createElement("button", { id: "add-btn" }, "+", {
+                    onclick: this.onAddTask.bind(this)
+                }),
             ]),
             createElement("ul", { id: "todos" }, todoItems),
         ]);
     }
 
-    onAddTask(task) {
-        this.state.push(task);
+    onAddTask() {
+        this.state.push(this.inputValue);
+        this.inputValue = '';
     }
 
-    onAddInputChange(element){
-
+    onAddInputChange(element) {
+        this.inputValue = element.target.value;
     }
 }
 
